@@ -2,7 +2,7 @@
 # Deploys the application directly to Google Cloud Run from source
 # Using the standard configuration requested
 
-PROJECT_ID="hackathon-481806"
+PROJECT_ID="solutions-89747"
 SERVICE_NAME="fair-audit-backend"
 REGION="us-central1"
 
