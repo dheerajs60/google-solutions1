@@ -3,7 +3,7 @@ from firebase_admin import credentials, storage, firestore
 import os
 
 # Ensure Firebase uses the solutions project
-firebase_project_id = os.getenv("FIREBASE_PROJECT_ID", "solutions-89747")
+firebase_project_id = os.getenv("FIREBASE_PROJECT_ID", "hackathon-481806")
 
 def initialize_firebase():
     if not firebase_admin._apps:

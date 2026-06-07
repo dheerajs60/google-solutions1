@@ -6,7 +6,7 @@ def get_bigquery_client():
     """Initializes and returns a BigQuery client using explicit project ID."""
     try:
         # Use hackathon project for BigQuery
-        current_project = os.getenv("GOOGLE_CLOUD_PROJECT", "solutions-89747")
+        current_project = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
         return bigquery.Client(project=current_project)
     except Exception as e:
         print(f"Warning: Could not initialize BigQuery client. Default credentials missing? Error: {e}")
@@ -46,7 +46,7 @@ def ensure_bigquery_schema(client: bigquery.Client, project_id: str, dataset_id:
 
 def initialize_bigquery():
     """Explicitly initializes the BigQuery schema."""
-    project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "solutions-89747")
+    project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
     client = get_bigquery_client()
     if not client:
         print("!!! BigQuery Error: Client could not be initialized.")
@@ -58,7 +58,7 @@ def initialize_bigquery():
     except Exception as e:
         print(f"!!! BigQuery Schema Error: {e}")
 
-project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "solutions-89747")
+project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
 bq_client = get_bigquery_client()
 
 # Call on module load, but ALSO allow explicit calls

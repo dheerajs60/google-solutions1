@@ -8,7 +8,7 @@ load_dotenv()
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 # 1. Project Configuration
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "solutions-89747")
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
 LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 # 2. Credential Management
