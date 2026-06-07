@@ -5,7 +5,7 @@ steps:
 
   # 1. Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'asia-south2-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/google-solutions:$COMMIT_SHA', '-f', 'backend/Dockerfile', '.']
+    args: ['build', '-t', 'asia-south2-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/google-solutions:$COMMIT_SHA', '-f', 'Dockerfile', '.']
 
   # 2. Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
