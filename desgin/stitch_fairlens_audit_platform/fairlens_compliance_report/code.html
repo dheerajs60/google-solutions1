@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-primary-fixed": "#0f0069",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "primary": "#3525cd",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface-container": "#edeeef",
+                        "on-background": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary-container": "#dad7ff",
+                        "tertiary-container": "#bc1d25",
+                        "surface-bright": "#f8f9fa",
+                        "outline": "#777587",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c7c4d8",
+                        "on-surface": "#191c1d",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary-container": "#ffd0cc",
+                        "background": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#005236",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "secondary-container": "#6cf8bb",
+                        "primary-fixed": "#e2dfff",
+                        "surface-dim": "#d9dadb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#4d44e3",
+                        "secondary-fixed": "#6ffbbe",
+                        "secondary": "#006c49",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "primary-container": "#4f46e5",
+                        "on-secondary-fixed": "#002113",
+                        "on-secondary-container": "#00714d",
+                        "inverse-primary": "#c3c0ff",
+                        "tertiary": "#960014",
+                        "surface": "#f8f9fa",
+                        "on-tertiary-fixed": "#410004"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-60 fixed left-0 top-0 bg-slate-100 dark:bg-slate-900 flex flex-col p-4 space-y-2 z-50">
+<div class="mb-8 px-2 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<span class="text-xl font-black text-slate-900 dark:text-white tracking-tighter">FairLens Audit</span>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</div>
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+<span class="text-sm font-medium">Bias Heatmap</span>
+</div>
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">compare_arrows</span>
+<span class="text-sm font-medium">Counterfactuals</span>
+</div>
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">science</span>
+<span class="text-sm font-medium">Mitigation Lab</span>
+</div>
+<!-- Active Tab -->
+<div class="bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-300 shadow-sm rounded-lg flex items-center gap-3 px-3 py-2 transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="text-sm font-medium">Compliance Report</span>
+</div>
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="text-sm font-medium">Audit History</span>
+</div>
+</nav>
+<div class="mt-auto border-t border-slate-200/50 dark:border-slate-800 pt-4 space-y-1">
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</div>
+<div class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="text-sm font-medium">Support</span>
+</div>
+</div>
+</aside>
+<!-- Top Header -->
+<header class="sticky top-0 h-14 px-8 ml-60 flex justify-between items-center bg-white/80 backdrop-blur-xl z-40">
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-2 focus:ring-primary/20" placeholder="Search audits..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-primary transition-colors">notifications</span>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Lead Auditor</p>
+<p class="text-[10px] text-on-surface-variant">Clinical precision active</p>
+</div>
+<img class="w-8 h-8 rounded-full border border-slate-200 object-cover" data-alt="Professional headshot of a female auditor in a modern office setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNx6tWUEnaxRBJg1uLZGXObU9MbundYcXcjWxmEdrEXaFTxGZA52mGuRFa1pyHavPPQgkEsvL5Jj5IGG38bhB-peAg1Vt8p8XSB0z6jxSdJ2SOC35L5NhX-IdS5ZqxZzKbv6S9-mnbu7LHHF2idRRKk9Im1LK3yEKZ_9ZoVOLT2qQM7UGDQceeKirJ1RzK5_phbOVa0K7YquHGlGhEQqOBMSdpV_fS7KThS0iJX0S316RrDf7soMgy8ADiIbXwz4n964oLckSm7Rw"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-60 p-12 max-w-5xl mx-auto">
+<!-- Document Header Section -->
+<div class="flex justify-between items-start mb-12">
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Compliance Audit Report</h1>
+<div class="flex items-center gap-4 text-sm text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">database</span>
+<span class="font-medium">Credit_Scoring_V4.csv</span>
+</div>
+<div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>October 24, 2023</span>
+</div>
+</div>
+</div>
+<button class="flex items-center gap-2 px-5 py-2.5 border-2 border-outline-variant text-primary font-bold rounded-lg hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined">download</span>
+                Download PDF
+            </button>
+</div>
+<!-- Compliance Content Layers -->
+<div class="space-y-6">
+<!-- EU AI Act Card -->
+<section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="p-6 flex items-center justify-between border-b border-surface-container-low">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">gavel</span>
+</div>
+<div>
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Regulation</span>
+<h2 class="text-lg font-bold text-on-surface leading-tight">EU AI Act (Article 10)</h2>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-xs font-bold rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                            PASS
+                        </span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">expand_less</span>
+</div>
+</div>
+<div class="p-8 bg-white">
+<h3 class="text-sm font-bold text-on-surface mb-4">Key Findings &amp; Data Governance</h3>
+<ul class="space-y-4">
+<li class="flex gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm mt-0.5">verified</span>
+<span>Dataset represents the geographical scope of the intended market with appropriate statistical balance across protected characteristics.</span>
+</li>
+<li class="flex gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm mt-0.5">verified</span>
+<span>Data minimization protocols applied; sensitive variables (Article 9 GDPR) were successfully sanitized prior to training.</span>
+</li>
+<li class="flex gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-sm mt-0.5">verified</span>
+<span>Human-in-the-loop oversight mechanisms established for edge-case overrides in high-risk classifications.</span>
+</li>
+</ul>
+</div>
+</section>
+<!-- EEOC 4/5ths Rule Card -->
+<section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="p-6 flex items-center justify-between border-b border-surface-container-low">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-600">work</span>
+</div>
+<div>
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Regulation</span>
+<h2 class="text-lg font-bold text-on-surface leading-tight">EEOC 4/5ths Rule</h2>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container text-xs font-bold rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                            FAIL
+                        </span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">expand_more</span>
+</div>
+</div>
+<!-- This section is collapsed, showing only summarized findings preview -->
+<div class="px-8 py-4 bg-surface-container-low/30 text-sm text-on-surface-variant italic">
+                    Critical disparity detected in selection rates for protected group 'Ethnicity (B)'. Ratio calculated at 0.72 (Required: 0.80).
+                </div>
+</section>
+<!-- ECOA Credit Discrimination Card -->
+<section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<div class="p-6 flex items-center justify-between border-b border-surface-container-low">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600">account_balance</span>
+</div>
+<div>
+<span class="text-[10px] font-bold tracking-widest text-primary uppercase">Regulation</span>
+<h2 class="text-lg font-bold text-on-surface leading-tight">ECOA Credit Discrimination</h2>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-xs font-bold rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                            PASS
+                        </span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">expand_more</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Call to Action -->
+<div class="mt-16 flex flex-col items-center">
+<button class="w-full max-w-md py-4 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[0.99] transition-transform flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+                Generate full report
+            </button>
+<p class="mt-4 text-xs text-on-surface-variant max-w-sm text-center">
+                Processing the full report will aggregate all metrics, counterfactual analyses, and mitigation strategies into a 45-page certified compliance document.
+            </p>
+</div>
+<!-- Aesthetic Texture Element -->
+<div class="mt-20 opacity-20 flex justify-center grayscale pointer-events-none">
+<img class="w-full max-w-lg h-32 object-cover rounded-3xl" data-alt="Abstract architectural lines and soft shadows on a white wall, minimalist aesthetic with high tonal depth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2dLpnIorWUH6VC606sdSxwcObHGfqhDyvu-0gjAiyyOH0S5jfwj6RU_kwkIfIswJ0zUemtWhlDTYsDpg5PZIbWUbiydWMgpVGwMLlSiZmpwtVl8s9uf7tZvmqeqZwV27U9Vyg9l8VtJb7UwWNmaWJs3ZrHDOL29qioaQq1N_GjsnY0jTQ-vHl8PEtHCLtuIHcGDr7J-A60H0LSgkQ7bFsuvyB9m1YMQbFMeRetZ9KP8b84c9d-Pnq6uu_hYLIIS6rMLak8dRgN4M"/>
+</div>
+</main>
+</body></html>

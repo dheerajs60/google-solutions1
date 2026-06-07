@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="error-overlay" style="position: fixed; top: 0; left: 0; z-index: 999999; background: rgba(255,0,0,0.9); color: white; padding: 20px; font-family: monospace; display: none; width: 100vw; height: 100vh; overflow: auto; pointer-events: none;">
+        <h2>Runtime Error Detected</h2>
+        <pre id="error-message"></pre>
+    </div>
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            document.getElementById('error-overlay').style.display = 'block';
+            document.getElementById('error-message').textContent += msg + '\n' + (error && error.stack ? error.stack : '') + '\n\n';
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            document.getElementById('error-overlay').style.display = 'block';
+            document.getElementById('error-message').textContent += 'Unhandled Promise Rejection: ' + event.reason + '\n\n';
+        });
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
