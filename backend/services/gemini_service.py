@@ -9,8 +9,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 # 1. Project Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
-# Use asia-south1 for better availability with 1.5-flash if needed
-LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-south1")
+# Use us-central1 for better availability with 2.5-pro
+LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 # 2. Credential Management
 def setup_credentials():
@@ -32,7 +32,7 @@ setup_credentials()
 # 3. Initialize Vertex AI
 try:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    model = GenerativeModel("gemini-3.5-flash")
+    model = GenerativeModel("gemini-2.5-pro")
 except Exception as e:
     print(f"Critical: Failed to initialize Vertex AI: {e}")
     model = None
