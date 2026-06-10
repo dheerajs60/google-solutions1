@@ -15,6 +15,8 @@ import { Settings } from './pages/Settings';
 
 import { onAuthStateChanged } from './services/authService';
 import useAuthStore from './store/useAuthStore';
+import { useAuditStore } from './store/useAuditStore';
+import { useUploadStore } from './store/useUploadStore';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
@@ -33,6 +35,10 @@ function App() {
         setUser(user);
       } else {
         clearUser();
+        useAuditStore.getState().clearAudit();
+        // useUploadStore uses set so it might be tricky to clear without a clear action, let's just use window.localStorage.clear() or implement a quick reset
+        window.localStorage.removeItem('fairlens-audit-storage');
+        window.localStorage.removeItem('fairlens-upload-storage');
       }
     });
 

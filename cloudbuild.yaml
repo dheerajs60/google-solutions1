@@ -25,6 +25,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--max-instances'
+      - '1'
 
 images:
   - 'asia-south2-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/fairlens:$COMMIT_SHA'
