@@ -28,7 +28,7 @@ export const Dashboard = () => {
         mitigationActive 
     } = useAuditStore();
     
-    const [recentActivites, setRecentActivities] = useState([]);
+    const [recentActivities, setRecentActivities] = useState([]);
     const location = useLocation();
     const [typedExplanation, setTypedExplanation] = useState('');
     const explanationRef = useRef('');
@@ -55,7 +55,15 @@ export const Dashboard = () => {
     useEffect(() => {
         const userId = auditService.getUserId();
         auditService.getHistory(userId).then(data => {
-            setRecentActivities(data.slice(0, 3));
+            if (Array.isArray(data)) {
+                setRecentActivities(data.slice(0, 3));
+            } else {
+                console.warn("Expected array for history, got:", typeof data);
+                setRecentActivities([]);
+            }
+        }).catch(err => {
+            console.error("Failed to fetch history:", err);
+            setRecentActivities([]);
         });
     }, []);
 
@@ -161,8 +169,9 @@ export const Dashboard = () => {
                     <div className="md:col-span-2 space-y-6">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-on-surface-variant dark:text-slate-500 mb-4">Recent Platform Activity</h3>
                         <div className="bg-white rounded-3xl ring-1 ring-outline-variant/10 shadow-sm overflow-hidden dark:bg-slate-900 dark:ring-slate-800">
-                             {recentActivites.length > 0 ? (
-                                 recentActivites.map((row, i) => (
+                             <div className="flex-1 space-y-3 relative z-10 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
+                            {Array.isArray(recentActivities) && recentActivities.length > 0 ? (
+                                 recentActivities.map((row, i) => (
                                     <div 
                                         key={i} 
                                         onClick={() => navigate(`/dashboard?auditId=${row.id}`)}
@@ -193,6 +202,7 @@ export const Dashboard = () => {
                                      Protocol history is empty. Your first audit will appear here.
                                  </div>
                              )}
+                             </div>
                         </div>
                     </div>
                     
@@ -371,8 +381,8 @@ export const Dashboard = () => {
                     {/* Activity Feed */}
                     <div className="card-layer p-6 dark:bg-slate-900 border-outline-variant/10">
                         <h3 className="headline-small mb-4">Recent Audit Activity</h3>
-                        <div className="space-y-4">
-                            {recentActivites.length > 0 ? recentActivites.slice(0, 3).map((act, i) => (
+                        <div className="space-y-4 relative z-10 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            {Array.isArray(recentActivities) && recentActivities.length > 0 ? recentActivities.slice(0, 3).map((act, i) => (
                                 <div key={i} className="flex items-start gap-3">
                                     <div className={`w-8 h-8 rounded-lg ${act.status === 'PASS' ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-amber-100 dark:bg-amber-900/30'} flex items-center justify-center`}>
                                         <span className={`material-symbols-outlined ${act.status === 'PASS' ? 'text-emerald-600' : 'text-amber-600'} text-lg`}>

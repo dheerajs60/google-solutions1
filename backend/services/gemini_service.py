@@ -42,7 +42,7 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
     """
     prompt = f"""
     You are a Lead Forensic Auditor specialized in Algorithmic Fairness. 
-    Conduct a high-fidelity 'Lead Auditor's Report' on the statistical drivers of bias.
+    Conduct a comprehensive and highly-detailed 'Lead Auditor's Report' on the statistical drivers of bias based on the provided metrics.
     
     AUDIT TRACE DATA:
     - Demographic Parity: {metrics.get('demographic_parity', {}).get('value', 'N/A')}
@@ -51,14 +51,14 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
     - Audited Attributes: {', '.join(sensitive_attrs)}
     
     SECTIONS:
-    1. **Statistical Driver Analysis**: Directly reference the exact numeric metrics above. Why do these disparities exist? Use terms like 'covariance' and 'sampling bias'.
-    2. **Proxy Variable Forensics**: Which other columns might be leaking info based on typical schemas?
-    3. **Actionable Remediation**: Provide ONE precise, implementation-ready recommendation (e.g., 'Targeted Reweighing' or 'Equalized Odds Post-Processing').
+    1. **Detailed Statistical Driver Analysis**: Deep dive into the numeric metrics above. Explain what these numbers signify in a real-world context and why these disparities might exist (discuss covariance, sampling bias, etc.).
+    2. **Proxy Variable Forensics**: Which other columns might be leaking info based on typical schemas? Provide specific examples.
+    3. **Comprehensive Remediation Strategy**: Provide detailed, implementation-ready recommendations for both pre-processing (like Reweighing) and post-processing (like Threshold Adjustment) to resolve these issues.
     
     CONSTRAINTS:
     - Highly professional, clinical, and authoritative tone.
     - NO markdown headers (e.g., #). Use bolding (**) for sections.
-    - Max 200 words of dense, metric-grounded analysis.
+    - Provide a thorough, in-depth analysis.
     
     AUDITOR'S REPORT:
     """
@@ -70,7 +70,7 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
     try:
         responses = model.generate_content(
             prompt,
-            generation_config={"max_output_tokens": 1024, "temperature": 0.2},
+            generation_config={"max_output_tokens": 2048, "temperature": 0.3},
             stream=True
         )
         for response in responses:
