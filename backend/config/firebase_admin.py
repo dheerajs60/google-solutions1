@@ -52,7 +52,7 @@ def initialize_firebase():
     # Safely get firestore client
     try:
         # initialize_app should already have the correct project ID from the certificate
-        return firestore.client()
+        return firestore.client(database_id="gsol1")
     except Exception as e:
         print(f"Warning: Could not initialize Firestore client. Default credentials missing? Error: {e}")
         return None

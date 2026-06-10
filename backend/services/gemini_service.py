@@ -31,7 +31,7 @@ setup_credentials()
 # 3. Initialize Vertex AI
 try:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    model = GenerativeModel("gemini-1.5-flash-001")
+    model = GenerativeModel("gemini-2.5-flash")
 except Exception as e:
     print(f"Critical: Failed to initialize Vertex AI: {e}")
     model = None
