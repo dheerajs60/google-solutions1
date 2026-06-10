@@ -7,8 +7,8 @@ export const Sidebar = () => {
     const navigate = useNavigate();
     
     const navItems = [
-        { path: '/dashboard', icon: 'home', label: 'Home' },
-        { path: '/upload', icon: 'add_chart', label: 'Run Audit' },
+        { path: '/upload', icon: 'home', label: 'Home' },
+        { path: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
         { path: '/heatmap', icon: 'grid_view', label: 'Bias Heatmap' },
         { path: '/mitigation', icon: 'science', label: 'Mitigation Lab' },
         { path: '/report', icon: 'description', label: 'Compliance Report' },
