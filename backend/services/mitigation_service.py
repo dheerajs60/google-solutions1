@@ -97,18 +97,19 @@ def run_mitigation(audit_id: str, reweighing_strength: float, threshold_adjust: 
         # AGGRESSIVE MODE: Ensuring the most "perfect" fairness result
         constraints = "demographic_parity"
         
-        optimizer = ThresholdOptimizer(
-            estimator=current_model,
-            constraints=constraints,
-            predict_method="predict_proba",
-            prefit=True
-        )
-        optimizer.fit(X_train, y_train, sensitive_features=sa_train)
-        final_preds = optimizer.predict(X_test, sensitive_features=sa_test)
-        
-        # If Aggressive (Auto-Correct), we re-verify and adjust slightly if needed
-        # (For now, demographic_parity is the gold standard for visual DI/DP equality)
-        print(f"Mitigation complete: Aggressive={apply_post}")
+        try:
+            optimizer = ThresholdOptimizer(
+                estimator=current_model,
+                constraints=constraints,
+                predict_method="predict_proba",
+                prefit=True
+            )
+            optimizer.fit(X_train, y_train, sensitive_features=sa_train)
+            final_preds = optimizer.predict(X_test, sensitive_features=sa_test)
+            print(f"Mitigation complete: Aggressive={apply_post}")
+        except Exception as e:
+            print(f"ThresholdOptimizer failed (likely degenerate labels): {e}. Falling back to pre-processing only.")
+            # final_preds remains what it was from Phase A
         
     # 3. EVALUATE AFTER
     acc_after = accuracy_score(y_test, final_preds)
