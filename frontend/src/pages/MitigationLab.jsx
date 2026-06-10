@@ -98,8 +98,8 @@ export const MitigationLab = () => {
                                 <p className="text-[10px] leading-relaxed text-on-surface-variant">Threshold optimization for equalized odds compliance.</p>
                             </div>
 
-                            <div className="pt-4 flex items-center space-x-3">
-                                <div className="relative inline-flex items-center cursor-pointer">
+                            <label className="pt-4 flex items-center space-x-3 cursor-pointer">
+                                <div className="relative inline-flex items-center">
                                     <input 
                                         type="checkbox" 
                                         checked={applyPostProcessing || false}
@@ -109,7 +109,7 @@ export const MitigationLab = () => {
                                     <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                 </div>
                                 <span className="text-xs font-bold text-on-surface">Auto-Correct (Aggressive)</span>
-                            </div>
+                            </label>
 
                             <button 
                                 onClick={handleSimulate}
