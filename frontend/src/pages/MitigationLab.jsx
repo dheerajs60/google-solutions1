@@ -27,6 +27,8 @@ export const MitigationLab = () => {
             setMitigationState({ mitigationResult: result });
         } catch (error) {
             console.error("Mitigation simulation failed", error);
+            const errorMsg = error.response?.data?.detail || error.message || "Unknown error";
+            alert(`Mitigation simulation failed: ${errorMsg}`);
         } finally {
             setIsSimulating(false);
         }
