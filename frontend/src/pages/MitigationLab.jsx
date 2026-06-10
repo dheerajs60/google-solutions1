@@ -159,7 +159,7 @@ export const MitigationLab = () => {
                                 { label: 'Equal Opportunity', key: 'equal_opportunity' },
                                 { label: 'Disparate Impact', key: 'disparate_impact' }
                             ].map((item) => {
-                                const original = metrics?.[item.key]?.value || 0;
+                                const original = mitigationResult?.before_metrics?.[item.key]?.value || metrics?.[item.key]?.value || 0;
                                 const mitigated = afterMetrics?.[item.key]?.value;
                                 const diff = mitigated ? mitigated - original : 0;
                                 
