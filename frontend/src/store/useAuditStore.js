@@ -96,7 +96,7 @@ export const useAuditStore = create(
                     overallScore: optimizedPoint ? optimizedPoint.fairness : state.overallScore,
                     geminiExplanation: '', // Clear to re-trigger AI analysis
                     lineage: [
-                        ...state.lineage,
+                        ...(state.lineage || []),
                         { stage: "Mitigation Applied", status: "PASS", description: "Successfully applied threshold optimization" }
                     ]
                 }));
