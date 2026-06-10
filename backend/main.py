@@ -18,19 +18,17 @@ try:
         print(f"!!! NON-BLOCKING STARTUP ERROR: {e}")
         # We don't raise here, so the app (and frontend) can still serve
         
+try:
     from backend.routers import audit, mitigation
     from backend.middleware.auth_middleware import FirebaseAuthMiddleware
-except Exception as e:
-    print(f"!!! CRITICAL STARTUP ERROR (UNRECOVERABLE): {e}")
-    import traceback
-    traceback.print_exc()
-    raise e
-
-try:
+    
     app.add_middleware(FirebaseAuthMiddleware)
+    
+    app.include_router(audit.router, prefix="/audit", tags=["Audit"])
+    app.include_router(mitigation.router, prefix="/audit", tags=["Mitigation"])
 except Exception as e:
-    print(f"!!! CRITICAL MIDDLEWARE ERROR: {e}")
-    raise e
+    print(f"!!! CRITICAL ROUTER/MIDDLEWARE ERROR: {e}")
+    # We don't raise here, we want the app to start so it binds to the port and Cloud Run doesn't return 503
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,8 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(audit.router, prefix="/audit", tags=["Audit"])
-app.include_router(mitigation.router, prefix="/audit", tags=["Mitigation"])
+
 
 @app.get("/health")
 def health_check():
