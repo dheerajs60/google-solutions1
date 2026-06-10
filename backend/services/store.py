@@ -217,6 +217,10 @@ def get_history(user_id: str = None) -> List[Dict[str, Any]]:
     return history
 
 def get_audit(audit_id: str) -> Dict[str, Any]:
+    # Prioritize in-memory state to avoid race conditions with slow BigQuery updates
+    if audit_id in ACTIVE_AUDITS:
+        return ACTIVE_AUDITS[audit_id]
+        
     if bq_client:
         try:
             query = f"""
@@ -238,7 +242,7 @@ def get_audit(audit_id: str) -> Dict[str, Any]:
         except Exception as e:
             print(f"BigQuery read error: {e}")
         
-    return ACTIVE_AUDITS.get(audit_id)
+    return None
 
 def get_audit_results(audit_id: str) -> Dict[str, Any]:
     audit = get_audit(audit_id)
