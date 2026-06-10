@@ -76,6 +76,8 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
         for response in responses:
             if response.text:
                 yield response.text
+    except Exception as e:
+        error_msg = str(e)
         yield f"\n\n**Error connecting to Vertex AI**: {error_msg}. Please check your quota and credentials."
 
 def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
