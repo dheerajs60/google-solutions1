@@ -32,7 +32,7 @@ setup_credentials()
 # 3. Initialize Vertex AI
 try:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    model = GenerativeModel("gemini-2.5-flash")
+    model = GenerativeModel("gemini-3.5-flash")
 except Exception as e:
     print(f"Critical: Failed to initialize Vertex AI: {e}")
     model = None
@@ -77,12 +77,16 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str], 
     try:
         responses = model.generate_content(
             prompt,
-            generation_config={"max_output_tokens": 2048, "temperature": 0.3},
+            generation_config={"max_output_tokens": 8192, "temperature": 0.3},
             stream=True
         )
         for response in responses:
-            if response.text:
-                yield response.text
+            try:
+                if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+                    yield response.text
+            except Exception as chunk_e:
+                print(f"Skipping empty chunk: {chunk_e}")
+                pass
     except Exception as e:
         error_msg = str(e)
         yield f"\n\n**Error connecting to Vertex AI**: {error_msg}. Please check your quota and credentials."
@@ -97,9 +101,11 @@ def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
     try:
         response = model.generate_content(
             f"Summarize bias in 100 words: {str(metrics)} for {sensitive_attrs}",
-            generation_config={"max_output_tokens": 1024, "temperature": 0.2}
+            generation_config={"max_output_tokens": 8192, "temperature": 0.2}
         )
-        return response.text.strip()
+        if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            return response.text.strip()
+        return "No text generated.".strip()
     except Exception as e:
         print(f"GenAI Error: {e}")
         return f"**Error connecting to Vertex AI**: {str(e)}"
