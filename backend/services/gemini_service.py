@@ -1,19 +1,40 @@
-import os
-import google.generativeai as genai
+import vertexai
+from vertexai.generative_models import GenerativeModel
 from dotenv import load_dotenv
 
 # Load .env from root or current dir
 load_dotenv()
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
-# Initialize Gemini AI directly via API Key (Bypass Vertex AI restrictions)
-api_key = os.getenv("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-    # Using gemini-1.5-flash via Developer API
-    model = genai.GenerativeModel("gemini-1.5-flash")
-else:
-    print("Critical: GEMINI_API_KEY is not set in environment.")
+# 1. Project Configuration
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
+# User specifically requested asia-south1 to resolve Vertex AI unavailability
+LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-south1")
+
+# 2. Credential Management
+def setup_credentials():
+    if not os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+        # Look for the service account key in common locations
+        possible_paths = [
+            "serviceAccountKey.json",
+            "backend/serviceAccountKey.json",
+            os.path.join(os.path.dirname(__file__), "../serviceAccountKey.json")
+        ]
+        for path in possible_paths:
+            if os.path.exists(path):
+                os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath(path)
+                print(f"Vertex AI: Using service account key at {path}")
+                break
+
+setup_credentials()
+
+# 3. Initialize Vertex AI
+try:
+    vertexai.init(project=PROJECT_ID, location=LOCATION)
+    # Using gemini-1.5-flash as it's highly available globally including asia-south1
+    model = GenerativeModel("gemini-1.5-flash")
+except Exception as e:
+    print(f"Critical: Failed to initialize Vertex AI: {e}")
     model = None
 
 def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
@@ -44,7 +65,7 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
     """
     
     if not model:
-        yield "**Gemini AI Unavailable**: API Key missing. Please ensure GEMINI_API_KEY is set."
+        yield "**Vertex AI Unavailable**: Real AI generation failed because Vertex AI could not be initialized. Please check your Google Cloud Application Default Credentials and ensure the Vertex AI API is enabled in project " + PROJECT_ID
         return
 
     try:
@@ -58,14 +79,14 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
                 yield response.text
     except Exception as e:
         error_msg = str(e)
-        yield f"\n\n**Error connecting to Gemini AI**: {error_msg}. Please check your API Key."
+        yield f"\n\n**Error connecting to Vertex AI**: {error_msg}. Please check your quota and credentials in {LOCATION}."
 
 def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
     """
     Non-streaming version for backward compatibility.
     """
     if not model:
-        return "**Gemini AI Unavailable**: API Key missing."
+        return "**Vertex AI Unavailable**: Real AI generation failed because Vertex AI could not be initialized."
         
     try:
         response = model.generate_content(
@@ -75,4 +96,4 @@ def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
         return response.text.strip()
     except Exception as e:
         print(f"GenAI Error: {e}")
-        return f"**Error connecting to Gemini AI**: {str(e)}"
+        return f"**Error connecting to Vertex AI**: {str(e)}"
