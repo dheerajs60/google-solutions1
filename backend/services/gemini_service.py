@@ -1,3 +1,4 @@
+import os
 import vertexai
 from vertexai.generative_models import GenerativeModel
 from dotenv import load_dotenv
@@ -8,8 +9,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 # 1. Project Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
-# User specifically requested asia-south1 to resolve Vertex AI unavailability
-LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-south1")
+LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
 
 # 2. Credential Management
 def setup_credentials():
@@ -31,8 +31,7 @@ setup_credentials()
 # 3. Initialize Vertex AI
 try:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
-    # Using gemini-1.5-flash as it's highly available globally including asia-south1
-    model = GenerativeModel("gemini-1.5-flash")
+    model = GenerativeModel("gemini-2.5-flash")
 except Exception as e:
     print(f"Critical: Failed to initialize Vertex AI: {e}")
     model = None
@@ -79,7 +78,7 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
                 yield response.text
     except Exception as e:
         error_msg = str(e)
-        yield f"\n\n**Error connecting to Vertex AI**: {error_msg}. Please check your quota and credentials in {LOCATION}."
+        yield f"\n\n**Error connecting to Vertex AI**: {error_msg}. Please check your quota and credentials."
 
 def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
     """

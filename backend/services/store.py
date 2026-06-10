@@ -55,17 +55,7 @@ def store_audit(audit_id: str, data: Dict[str, Any], results: Dict[str, Any] = N
             }
             full_details = {**serializable_data, "results": results, "user_id": user_id}
             table_ref = f"{project_id}.fair_audit.audits"
-            def np_encoder(obj):
-                import numpy as np
-                if isinstance(obj, np.integer): return int(obj)
-                if isinstance(obj, np.floating): 
-                    if np.isnan(obj) or np.isinf(obj): return str(obj)
-                    return float(obj)
-                if isinstance(obj, np.ndarray): return obj.tolist()
-                return str(obj)
-                
-            clean_details = json.loads(json.dumps(full_details, default=np_encoder))
-            rows_to_insert = [{"audit_id": audit_id, "full_details": clean_details}]
+            rows_to_insert = [{"audit_id": audit_id, "full_details": json.dumps(full_details)}]
             
             errors = bq_client.insert_rows_json(table_ref, rows_to_insert)
             if errors:
@@ -83,15 +73,7 @@ def update_audit_results(audit_id: str, results: Dict[str, Any]):
         
     if bq_client:
         try:
-            def np_encoder(obj):
-                import numpy as np
-                if isinstance(obj, np.integer): return int(obj)
-                if isinstance(obj, np.floating): return float(obj)
-                if isinstance(obj, np.ndarray): return obj.tolist()
-                return str(obj)
-
-            clean_details = json.loads(json.dumps(ACTIVE_AUDITS.get(audit_id, {"results": results}), default=np_encoder))
-            details_str = json.dumps(clean_details) # UPDATE statement uses string
+            details_str = json.dumps(ACTIVE_AUDITS.get(audit_id, {"results": results}))
             query = f"""
                 UPDATE `{project_id}.fair_audit.audits`
                 SET full_details = @details
@@ -132,15 +114,7 @@ def update_mitigation_results(audit_id: str, mitigation_res: Dict[str, Any]):
         if bq_client:
             # We also update the full details in BigQuery
             if audit_id in ACTIVE_AUDITS:
-                def np_encoder(obj):
-                    import numpy as np
-                    if isinstance(obj, np.integer): return int(obj)
-                    if isinstance(obj, np.floating): return float(obj)
-                    if isinstance(obj, np.ndarray): return obj.tolist()
-                    return str(obj)
-
-                clean_details = json.loads(json.dumps(ACTIVE_AUDITS[audit_id], default=np_encoder))
-                details_str = json.dumps(clean_details) # UPDATE uses string literal
+                details_str = json.dumps(ACTIVE_AUDITS[audit_id])
                 query = f"UPDATE `{project_id}.fair_audit.audits` SET full_details = @details WHERE audit_id = @id"
                 job_config = bigquery.QueryJobConfig(
                     query_parameters=[
