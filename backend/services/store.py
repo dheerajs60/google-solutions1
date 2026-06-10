@@ -1,11 +1,20 @@
 from typing import Dict, Any, List
 import json
 import datetime
+import numpy as np
 from google.cloud import bigquery
 from firebase_admin import firestore
 
 from backend.config.firebase_admin import db
 from backend.config.bigquery_client import bq_client, project_id
+
+def np_encoder(obj):
+    if isinstance(obj, np.integer): return int(obj)
+    if isinstance(obj, np.floating):
+        if np.isnan(obj) or np.isinf(obj): return str(obj)
+        return float(obj)
+    if isinstance(obj, np.ndarray): return obj.tolist()
+    return str(obj)
 
 # Global in-memory dictionary to store audit states.
 ACTIVE_AUDITS: Dict[str, Dict[str, Any]] = {}
@@ -55,7 +64,8 @@ def store_audit(audit_id: str, data: Dict[str, Any], results: Dict[str, Any] = N
             }
             full_details = {**serializable_data, "results": results, "user_id": user_id}
             table_ref = f"{project_id}.fair_audit.audits"
-            rows_to_insert = [{"audit_id": audit_id, "full_details": json.dumps(full_details)}]
+            clean_details = json.loads(json.dumps(full_details, default=np_encoder))
+            rows_to_insert = [{"audit_id": audit_id, "full_details": json.dumps(clean_details)}]
             
             errors = bq_client.insert_rows_json(table_ref, rows_to_insert)
             if errors:
@@ -73,7 +83,8 @@ def update_audit_results(audit_id: str, results: Dict[str, Any]):
         
     if bq_client:
         try:
-            details_str = json.dumps(ACTIVE_AUDITS.get(audit_id, {"results": results}))
+            clean_details = json.loads(json.dumps(ACTIVE_AUDITS.get(audit_id, {"results": results}), default=np_encoder))
+            details_str = json.dumps(clean_details)
             query = f"""
                 UPDATE `{project_id}.fair_audit.audits`
                 SET full_details = @details
@@ -114,7 +125,8 @@ def update_mitigation_results(audit_id: str, mitigation_res: Dict[str, Any]):
         if bq_client:
             # We also update the full details in BigQuery
             if audit_id in ACTIVE_AUDITS:
-                details_str = json.dumps(ACTIVE_AUDITS[audit_id])
+                clean_details = json.loads(json.dumps(ACTIVE_AUDITS[audit_id], default=np_encoder))
+                details_str = json.dumps(clean_details)
                 query = f"UPDATE `{project_id}.fair_audit.audits` SET full_details = @details WHERE audit_id = @id"
                 job_config = bigquery.QueryJobConfig(
                     query_parameters=[

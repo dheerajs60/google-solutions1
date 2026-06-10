@@ -9,7 +9,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 # 1. Project Configuration
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hackathon-481806")
-LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+# Use asia-south1 for better availability with 1.5-flash if needed
+LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-south1")
 
 # 2. Credential Management
 def setup_credentials():
@@ -36,9 +37,9 @@ except Exception as e:
     print(f"Critical: Failed to initialize Vertex AI: {e}")
     model = None
 
-def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
+def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str], dataset_stats: dict = {}):
     """
-    Generates a professional bias audit explanation using Vertex AI Gemini 1.5 Pro (Streaming).
+    Generates a professional bias audit explanation using Vertex AI Gemini.
     """
     prompt = f"""
     You are a Lead Forensic Auditor specialized in Algorithmic Fairness. 
@@ -50,8 +51,14 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
     - Disparate Impact: {metrics.get('disparate_impact', {}).get('value', 'N/A')}
     - Audited Attributes: {', '.join(sensitive_attrs)}
     
+    DATASET CONTEXT:
+    - Total Rows: {dataset_stats.get('total_rows', 'Unknown')}
+    - Columns: {', '.join(dataset_stats.get('columns', []))}
+    - Sample Data (first 3 rows):
+    {dataset_stats.get('head', 'Not provided')}
+    
     SECTIONS:
-    1. **Detailed Statistical Driver Analysis**: Deep dive into the numeric metrics above. Explain what these numbers signify in a real-world context and why these disparities might exist (discuss covariance, sampling bias, etc.).
+    1. **Detailed Statistical Driver Analysis**: Deep dive into the numeric metrics and the dataset context. Explain what these numbers signify in a real-world context for this specific dataset and why these disparities might exist (discuss covariance, sampling bias, etc.).
     2. **Proxy Variable Forensics**: Which other columns might be leaking info based on typical schemas? Provide specific examples.
     3. **Comprehensive Remediation Strategy**: Provide detailed, implementation-ready recommendations for both pre-processing (like Reweighing) and post-processing (like Threshold Adjustment) to resolve these issues.
     

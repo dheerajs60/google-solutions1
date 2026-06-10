@@ -44,8 +44,10 @@ async def stream_audit_analysis(audit_id: str):
     results = audit_data.get("results")
     sensitive_attrs = audit_data.get("sensitive_attrs")
     
+    dataset_stats = audit_data.get("dataset_stats", {})
+    
     return StreamingResponse(
-        generate_bias_explanation_stream(results["metrics"], sensitive_attrs),
+        generate_bias_explanation_stream(results["metrics"], sensitive_attrs, dataset_stats),
         media_type="text/event-stream"
     )
 
@@ -150,6 +152,12 @@ async def run_audit(
         df, log = preprocess_data(df, target_column, sensitive_attrs)
         result_dict = run_bias_analysis(df, sensitive_attrs, target_column, positive_label, audit_id=audit_id)
         
+        dataset_stats = {
+            "head": df.head(3).to_markdown() if not df.empty else "No data",
+            "columns": list(df.columns),
+            "total_rows": len(df)
+        }
+        
         # Track history
         data_to_store = {
             "dataset": file.filename,
@@ -157,7 +165,8 @@ async def run_audit(
             "date": datetime.datetime.now().strftime("%Y-%m-%d"),
             "sensitive_attrs": sensitive_attrs,
             "target_column": target_column,
-            "positive_label": positive_label
+            "positive_label": positive_label,
+            "dataset_stats": dataset_stats
         }
         store_audit(result_dict["id"], data_to_store, result_dict, user_id=user_id)
         
