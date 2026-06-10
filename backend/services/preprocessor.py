@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.impute import KNNImputer
 
 def preprocess_data(df: pd.DataFrame, target_column: str, sensitive_attributes: list) -> tuple[pd.DataFrame, list[str]]:
     log = []
@@ -42,6 +43,8 @@ def preprocess_data(df: pd.DataFrame, target_column: str, sensitive_attributes: 
         raise ValueError("Dataset is empty after dropping missing target values.")
 
     # 4. Fill missing values
+    numeric_cols_with_missing = []
+    
     for col in df.columns:
         if col == target_column:
             continue
@@ -49,11 +52,7 @@ def preprocess_data(df: pd.DataFrame, target_column: str, sensitive_attributes: 
         missing_count = df[col].isnull().sum()
         if missing_count > 0:
             if pd.api.types.is_numeric_dtype(df[col]):
-                median_val = df[col].median()
-                if pd.isna(median_val):  # Handle completely null columns
-                    median_val = 0.0
-                df[col] = df[col].fillna(median_val)
-                log.append(f"Filled {missing_count} missing values in numeric column '{col}' with median {median_val:.2f}")
+                numeric_cols_with_missing.append(col)
             else:
                 if df[col].mode().empty:
                     mode_val = "Unknown"
@@ -61,6 +60,11 @@ def preprocess_data(df: pd.DataFrame, target_column: str, sensitive_attributes: 
                     mode_val = df[col].mode()[0]
                 df[col] = df[col].fillna(mode_val)
                 log.append(f"Filled {missing_count} missing values in categorical column '{col}' with mode '{mode_val}'")
+                
+    if numeric_cols_with_missing:
+        imputer = KNNImputer(n_neighbors=5, weights='distance')
+        df[numeric_cols_with_missing] = imputer.fit_transform(df[numeric_cols_with_missing])
+        log.append(f"Aggressively autocorrected missing values in numeric columns: {numeric_cols_with_missing} using ML (KNN Imputer)")
                 
     # 5. Encode categorical columns (except target)
     for col in df.columns:

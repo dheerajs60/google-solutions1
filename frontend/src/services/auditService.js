@@ -65,9 +65,22 @@ class AuditService {
     }
 
     async downloadAuditCSV(auditId) {
-        const baseURL = apiClient.defaults.baseURL || '';
-        const url = `${baseURL}/audit/${auditId}/export/csv`;
-        window.open(url, '_blank');
+        try {
+            const response = await apiClient.get(`/audit/${auditId}/export/csv`, {
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `FairLens_Audit_${auditId}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Failed to download CSV:", error);
+            alert("Failed to download CSV report.");
+        }
     }
 
     async getSettings(userId) {
@@ -81,7 +94,7 @@ class AuditService {
     }
     
     getUserId() {
-        return auth.currentUser?.uid;
+        return auth.currentUser?.email;
     }
 }
 

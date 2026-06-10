@@ -23,6 +23,7 @@ const CustomDot = (props) => {
                 stroke="#ffffff" 
                 strokeWidth={2}
                 className="transition-all duration-300 transform hover:scale-150 cursor-pointer" 
+                style={{ transformOrigin: `${cx}px ${cy}px` }}
             />
         </g>
     );

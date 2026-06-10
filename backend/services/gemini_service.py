@@ -64,13 +64,7 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
     """
     
     if not model:
-        simulated_analysis = generate_simulated_report(metrics)
-        # Yield in smaller chunks for a better "typing" effect in UI
-        # Yield in smaller chunks for a better "typing" effect in UI
-        for i in range(0, len(simulated_analysis), 5):
-            yield simulated_analysis[i:i+5]
-            import time
-            time.sleep(0.01)
+        yield "**Vertex AI Unavailable**: Real AI generation failed because Vertex AI could not be initialized. Please check your Google Cloud Application Default Credentials and ensure the Vertex AI API is enabled in project " + PROJECT_ID
         return
 
     try:
@@ -82,86 +76,14 @@ def generate_bias_explanation_stream(metrics: dict, sensitive_attrs: list[str]):
         for response in responses:
             if response.text:
                 yield response.text
-    except Exception as e:
-        error_msg = str(e)
-        print(f"Vertex AI API failure (silencing for UI): {error_msg}")
-        
-        # Professional fallback without technical error logs
-        simulated_analysis = generate_simulated_report(metrics)
-        for i in range(0, len(simulated_analysis), 10):
-            yield simulated_analysis[i:i+10]
-            import time
-            time.sleep(0.005)
-
-
-def generate_simulated_report(metrics: dict) -> str:
-    """
-    Generates a high-fidelity, 50+ line forensic report when real AI is unavailable.
-    """
-    dp_val = metrics.get('demographic_parity', {}).get('value', 0.5)
-    di_val = metrics.get('disparate_impact', {}).get('value', 0.5)
-    eo_val = metrics.get('equal_opportunity', {}).get('value', 0.5)
-    
-    severity = "CRITICAL" if di_val < 0.6 or dp_val < 0.6 else "MODERATE"
-    
-    sections = [
-        "**LEAD AUDITOR FORENSIC ANALYSIS**",
-        "------------------------------------------------",
-        f"Audit Status: {severity} PARITY GAP",
-        f"Reference Code: FL-{severity[:3]}-{di_val:.2f}",
-        "",
-        "**1. CORE METRIC ANALYSIS**",
-        "The evaluation focuses on the transition from training distribution to predictive inference. ",
-        f"Analysis confirms a Disparate Impact ratio of {di_val:.4f}. Under standard (8/10ths) regulatory ",
-        f"guidelines, this indicates a {'significant' if di_val < 0.8 else 'marginal'} bias signature. ",
-        f"The Demographic Parity gap of {dp_val:.4f} suggests that selection rates stay significantly ",
-        "decoupled across protected class boundaries.",
-        "",
-        "**2. STATISTICAL DRIVERS**",
-        "Identified specific covariance patterns between the target label and sensitive attributes. ",
-        "Observed observations include:",
-        f"- **Class Imbalance**: High propensity for negative prediction in protected subsets.",
-        "- **Intersectionality**: Compounding bias through second-order effects.",
-        "- **Information Leakage**: Indirect capture of proxy variables.",
-        "",
-        "**3. PROXY VARIABLE EXPOSURE**",
-        "Models often 're-learn' protected patterns through technical proxies including:",
-        "- Zip Codes (Race/Ethnicity proxy)",
-        "- Employment Gaps (Age/Gender proxy)",
-        "- Purchase Patterns (Socio-economic proxy)",
-        "Recommendation: Deep-feature importance ranking to verify decision boundaries.",
-        "",
-        "**4. COMPLIANCE IMPACT**",
-        "Disparate Impact below parity thresholds often triggers regulatory investigation. ",
-        "Deployment in high-stakes domains (Finance, HR, Healthcare) may fail transparency ",
-        "audits. Immediate mitigation is required to minimize liability.",
-        "",
-        "**5. REMEDIATION STRATEGY**",
-        "We propose a three-phase intervention roadmap:",
-        "",
-        "**PHASE A: PRE-PROCESSING (Data)**",
-        "- **Targeted Reweighing**: Adjusting sample weights to ensure demographic independence.",
-        "",
-        "**PHASE B: IN-PROCESSING (Model)**",
-        "- **Adversarial Debiasing**: Penalizing the model for providing predictable info to adversaries.",
-        "",
-        "**PHASE C: POST-PROCESSING (Inference)**",
-        "- **Equalized Odds**: Calibrating probability thresholds for parity in predictive error rates.",
-        "",
-        "**6. FINAL AUDITOR SIGN-OFF**",
-        "Validation of the next model iteration is required before production promotion. ",
-        "This audit trace is stored in the persistent ledger for future regulatory review.",
-        "------------------------------------------------",
-    ]
-    
-    return "\n".join(sections)
+        yield f"\n\n**Error connecting to Vertex AI**: {error_msg}. Please check your quota and credentials."
 
 def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
     """
     Non-streaming version for backward compatibility.
     """
     if not model:
-        return generate_simulated_report(metrics)
+        return "**Vertex AI Unavailable**: Real AI generation failed because Vertex AI could not be initialized."
         
     try:
         response = model.generate_content(
@@ -171,4 +93,4 @@ def generate_bias_explanation(metrics: dict, sensitive_attrs: list[str]) -> str:
         return response.text.strip()
     except Exception as e:
         print(f"GenAI Error: {e}")
-        return generate_simulated_report(metrics)
+        return f"**Error connecting to Vertex AI**: {str(e)}"
