@@ -94,6 +94,7 @@ export const useAuditStore = create(
                     mitigationActive: true,
                     metrics: after_metrics,
                     overallScore: optimizedPoint ? optimizedPoint.fairness : state.overallScore,
+                    geminiExplanation: '', // Clear to re-trigger AI analysis
                     lineage: [
                         ...state.lineage,
                         { stage: "Mitigation Applied", status: "PASS", description: "Successfully applied threshold optimization" }

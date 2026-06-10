@@ -28,7 +28,10 @@ async def get_audit_analysis(audit_id: str):
     results = audit_data.get("results")
     sensitive_attrs = audit_data.get("sensitive_attrs")
     
-    explanation = generate_bias_explanation(results["metrics"], sensitive_attrs)
+    mitigation_res = audit_data.get("mitigation_results")
+    metrics_to_analyze = mitigation_res["after_metrics"] if mitigation_res else results["metrics"]
+    
+    explanation = generate_bias_explanation(metrics_to_analyze, sensitive_attrs)
     
     results["gemini_explanation"] = explanation
     update_audit_results(audit_id, results)
@@ -44,10 +47,13 @@ async def stream_audit_analysis(audit_id: str):
     results = audit_data.get("results")
     sensitive_attrs = audit_data.get("sensitive_attrs")
     
+    mitigation_res = audit_data.get("mitigation_results")
+    metrics_to_analyze = mitigation_res["after_metrics"] if mitigation_res else results["metrics"]
+    
     dataset_stats = audit_data.get("dataset_stats", {})
     
     return StreamingResponse(
-        generate_bias_explanation_stream(results["metrics"], sensitive_attrs, dataset_stats),
+        generate_bias_explanation_stream(metrics_to_analyze, sensitive_attrs, dataset_stats),
         media_type="text/event-stream"
     )
 
