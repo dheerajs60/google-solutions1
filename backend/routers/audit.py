@@ -62,12 +62,7 @@ async def update_settings(user_id: str, settings: Dict[str, Any]):
 async def get_history(user_id: str = None):
     return store_get_history(user_id)
 
-@router.get("/{audit_id}", response_model=AuditResponse)
-async def read_audit(audit_id: str):
-    results = get_audit_results(audit_id)
-    if not results:
-        raise HTTPException(status_code=404, detail="Audit not found")
-    return results
+
 
 @router.get("/{audit_id}/export/csv")
 async def export_audit_csv(audit_id: str):
@@ -165,4 +160,11 @@ async def run_audit(
     except Exception as e:
         # Pass meaningful errors like "Label not found" directly to frontend
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/{audit_id}", response_model=AuditResponse)
+async def read_audit(audit_id: str):
+    results = get_audit_results(audit_id)
+    if not results:
+        raise HTTPException(status_code=404, detail="Audit not found")
+    return results
 
