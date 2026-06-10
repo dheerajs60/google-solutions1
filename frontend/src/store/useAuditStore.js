@@ -8,7 +8,9 @@ export const useAuditStore = create(
             // Core Audit Data
             auditId: null,
             overallScore: null,
+            originalOverallScore: null,
             metrics: null,
+            originalMetrics: null,
             heatmap: [],
             lineage: [],
             geminiExplanation: '',
@@ -47,7 +49,9 @@ export const useAuditStore = create(
                 set({
                     auditId: results.id,
                     overallScore: results.overall_score,
+                    originalOverallScore: results.overall_score,
                     metrics: results.metrics,
+                    originalMetrics: results.metrics,
                     heatmap: results.heatmap,
                     lineage: results.lineage,
                     geminiExplanation: results.gemini_explanation,
@@ -99,6 +103,26 @@ export const useAuditStore = create(
                         ...(state.lineage || []),
                         { stage: "Mitigation Applied", status: "PASS", description: "Successfully applied threshold optimization" }
                     ]
+                }));
+            },
+            
+            revertMitigation: async () => {
+                const state = get();
+                if (!state.auditId) return;
+                
+                try {
+                    await auditService.clearMitigation(state.auditId);
+                } catch (err) {
+                    console.error("Failed to clear mitigation on backend", err);
+                }
+                
+                set((state) => ({
+                    mitigationResult: null,
+                    mitigationActive: false,
+                    metrics: state.originalMetrics || state.metrics,
+                    overallScore: state.originalOverallScore || state.overallScore,
+                    geminiExplanation: '', // Clear to re-trigger AI analysis on original metrics
+                    lineage: (state.lineage || []).filter(l => l.stage !== "Mitigation Applied")
                 }));
             },
             

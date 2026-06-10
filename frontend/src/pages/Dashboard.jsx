@@ -25,7 +25,8 @@ export const Dashboard = () => {
         isAIAnalysing,
         aiAnalysisFailed,
         error,
-        mitigationActive 
+        mitigationActive,
+        revertMitigation
     } = useAuditStore();
     
     const [recentActivities, setRecentActivities] = useState([]);
@@ -231,16 +232,34 @@ export const Dashboard = () => {
     return (
         <div className="flex flex-col gap-8 pb-12 w-full animate-in fade-in duration-700 transition-colors">
             {/* Educational Header */}
-            <div className="bg-primary/5 border border-primary/10 rounded-2xl p-6 flex items-start gap-4 dark:bg-slate-900 dark:border-slate-800">
-                <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>gavel</span>
-                <div>
-                    <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-1">Audit Protocol: How it works</h3>
-                    <p className="text-[10px] text-on-surface-variant leading-relaxed max-w-3xl font-medium dark:text-slate-400">
-                        This dashboard provides a high-fidelity overview of your model's fairness signature. The <strong>Integrity Score</strong> is a weighted average of three critical dimensions: <strong>Selection Parity</strong> (are outcomes balanced?), <strong>Error Equity</strong> (are mistakes distributed fairly?), and <strong>Impact Ratios</strong> (long-term societal effects). 
-                        <br/><br/>
-                        Use the <strong>Bias Lineage</strong> trace on the right to track how decisions moved through the audit pipe, and review the <strong>Lead Auditor's Report</strong> below for AI-driven clinical insights.
-                    </p>
+            <div className="bg-primary/5 border border-primary/10 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4 dark:bg-slate-900 dark:border-slate-800">
+                <div className="flex items-start gap-4">
+                    <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>gavel</span>
+                    <div>
+                        <div className="flex items-center gap-3 mb-1">
+                            <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">Audit Protocol: How it works</h3>
+                            {mitigationActive && (
+                                <span className="bg-secondary/10 text-secondary border border-secondary/20 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[10px]">auto_fix_high</span>
+                                    Mitigation Active
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-[10px] text-on-surface-variant leading-relaxed max-w-3xl font-medium dark:text-slate-400">
+                            This dashboard provides a high-fidelity overview of your model's fairness signature. The <strong>Integrity Score</strong> is a weighted average of three critical dimensions: <strong>Selection Parity</strong> (are outcomes balanced?), <strong>Error Equity</strong> (are mistakes distributed fairly?), and <strong>Impact Ratios</strong> (long-term societal effects). 
+                            <br/><br/>
+                            Use the <strong>Bias Lineage</strong> trace on the right to track how decisions moved through the audit pipe, and review the <strong>Lead Auditor's Report</strong> below for AI-driven clinical insights.
+                        </p>
+                    </div>
                 </div>
+                {mitigationActive && (
+                    <button 
+                        onClick={revertMitigation}
+                        className="shrink-0 px-4 py-2 bg-error/10 text-error rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-error/20 transition-all shadow-sm active:scale-95"
+                    >
+                        Revert Mitigation
+                    </button>
+                )}
             </div>
 
             {/* Summary Score Cards */}

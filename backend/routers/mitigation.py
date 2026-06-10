@@ -22,3 +22,32 @@ async def mitigate_bias(request: MitigationRequest):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/clear")
+async def clear_mitigation(request: dict):
+    audit_id = request.get("audit_id")
+    from backend.services.store import ACTIVE_AUDITS, bq_client, project_id, np_encoder
+    import json
+    from google.cloud import bigquery
+    if audit_id in ACTIVE_AUDITS:
+        if "mitigation_results" in ACTIVE_AUDITS[audit_id]:
+            del ACTIVE_AUDITS[audit_id]["mitigation_results"]
+            
+        if bq_client:
+            try:
+                data = ACTIVE_AUDITS[audit_id]
+                serializable_data = {
+                    k: v for k, v in data.items() 
+                    if k in ["dataset", "date", "model_type", "sensitive_attrs", "target_column", "positive_label", "results", "mitigation_results", "user_id"]
+                }
+                clean_details = json.loads(json.dumps(serializable_data, default=np_encoder))
+                details_str = json.dumps(clean_details)
+                query = f"UPDATE `{project_id}.fair_audit.audits` SET full_details = @details WHERE audit_id = @id"
+                job_config = bigquery.QueryJobConfig(query_parameters=[
+                    bigquery.ScalarQueryParameter("details", "STRING", details_str),
+                    bigquery.ScalarQueryParameter("id", "STRING", audit_id),
+                ])
+                bq_client.query(query, job_config=job_config).result()
+            except Exception as e:
+                print(f"Failed to clear mitigation in BQ: {e}")
+    return {"status": "success"}

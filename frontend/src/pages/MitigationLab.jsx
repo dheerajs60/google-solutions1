@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const MitigationLab = () => {
     const { 
-        auditId, metrics, applyMitigation,
+        auditId, metrics, applyMitigation, revertMitigation, mitigationActive,
         reweighingStrength, thresholdAdjust, applyPostProcessing,
         mitigationResult, setMitigationState
     } = useAuditStore();
@@ -36,6 +36,11 @@ export const MitigationLab = () => {
 
     const handleApply = () => {
         applyMitigation(mitigationResult);
+        navigate('/dashboard');
+    };
+    
+    const handleRevert = async () => {
+        await revertMitigation();
         navigate('/dashboard');
     };
 
@@ -127,6 +132,15 @@ export const MitigationLab = () => {
                                     className="w-full py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-secondary/90 transition-all shadow-lg active:scale-[0.98]"
                                 >
                                     Apply to Dashboard
+                                </button>
+                            )}
+                            
+                            {mitigationActive && (
+                                <button 
+                                    onClick={handleRevert}
+                                    className="w-full py-4 bg-error/10 text-error text-xs font-black uppercase tracking-widest rounded-xl hover:bg-error/20 transition-all shadow-sm active:scale-[0.98]"
+                                >
+                                    Revert Mitigation
                                 </button>
                             )}
                         </div>
