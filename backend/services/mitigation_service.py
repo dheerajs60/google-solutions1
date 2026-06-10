@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.metrics import demographic_parity_difference, equalized_odds_difference, demographic_parity_ratio
 from backend.models.schemas import MitigationResponse, AuditMetric, ParetoPoint
-from backend.services.store import get_audit
+from backend.services.store import ACTIVE_AUDITS
 
 def _get_status(score):
     return "PASS" if score >= 0.8 else "WARNING" if score >= 0.6 else "FAIL"
@@ -12,9 +12,9 @@ from fairlearn.preprocessing import CorrelationRemover
 from sklearn.ensemble import RandomForestClassifier
 
 def run_mitigation(audit_id: str, reweighing_strength: float, threshold_adjust: float, apply_post: bool) -> MitigationResponse:
-    stored = get_audit(audit_id)
+    stored = ACTIVE_AUDITS.get(audit_id)
     if not stored:
-        raise ValueError("Audit ID not found or expired.")
+        raise ValueError("Audit ID not found or expired from memory. Please re-run the audit.")
         
     base_model = stored["model"]
     X_train = stored["X_train"]
