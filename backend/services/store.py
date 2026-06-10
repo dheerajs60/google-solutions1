@@ -125,7 +125,12 @@ def update_mitigation_results(audit_id: str, mitigation_res: Dict[str, Any]):
         if bq_client:
             # We also update the full details in BigQuery
             if audit_id in ACTIVE_AUDITS:
-                clean_details = json.loads(json.dumps(ACTIVE_AUDITS[audit_id], default=np_encoder))
+                data = ACTIVE_AUDITS[audit_id]
+                serializable_data = {
+                    k: v for k, v in data.items() 
+                    if k in ["dataset", "date", "model_type", "sensitive_attrs", "target_column", "positive_label", "results", "mitigation_results", "user_id"]
+                }
+                clean_details = json.loads(json.dumps(serializable_data, default=np_encoder))
                 details_str = json.dumps(clean_details)
                 query = f"UPDATE `{project_id}.fair_audit.audits` SET full_details = @details WHERE audit_id = @id"
                 job_config = bigquery.QueryJobConfig(
