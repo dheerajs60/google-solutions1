@@ -3,8 +3,8 @@
 # Using the standard configuration requested
 
 PROJECT_ID="hackathon-481806"
-SERVICE_NAME="fair-audit-backend"
-REGION="us-central1"
+SERVICE_NAME="google-solutions"
+REGION="asia-south2"
 
 echo "Deploying FastAPI backend to Google Cloud Run..."
 gcloud run deploy $SERVICE_NAME \

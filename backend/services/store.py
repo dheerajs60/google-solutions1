@@ -165,7 +165,9 @@ def get_history(user_id: str = None) -> List[Dict[str, Any]]:
             query += " ORDER BY audit_id DESC LIMIT 50"
             results = bq_client.query(query).result()
             for row in results:
-                details = json.loads(row.full_details)
+                details = row.full_details
+                if isinstance(details, str):
+                    details = json.loads(details)
                 res = details.get("results", {})
                 overall_score = res.get("overall_score", 0.0)
                 status = "PASS" if overall_score >= 0.8 else "WARNING" if overall_score >= 0.6 else "FAIL"
@@ -217,7 +219,10 @@ def get_audit(audit_id: str) -> Dict[str, Any]:
             )
             result = bq_client.query(query, job_config=job_config).result()
             for row in result:
-                return json.loads(row.full_details)
+                details = row.full_details
+                if isinstance(details, str):
+                    return json.loads(details)
+                return details
         except Exception as e:
             print(f"BigQuery read error: {e}")
         
