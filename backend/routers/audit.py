@@ -153,7 +153,7 @@ async def run_audit(
         result_dict = run_bias_analysis(df, sensitive_attrs, target_column, positive_label, audit_id=audit_id)
         
         dataset_stats = {
-            "head": df.head(3).to_markdown() if not df.empty else "No data",
+            "head": df.head(3).to_string() if not df.empty else "No data",
             "columns": list(df.columns),
             "total_rows": len(df)
         }
