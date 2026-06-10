@@ -274,7 +274,7 @@ export const Dashboard = () => {
                     <div className="absolute top-0 right-0 p-4">
                         <div className="flex items-center space-x-1.5 bg-primary/5 px-3 py-1 rounded-full dark:bg-primary/10">
                             <span className="material-symbols-outlined text-[14px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-                            <span className="text-[10px] font-bold text-primary tracking-tight uppercase">Vertex AI • Gemini 1.5 Pro</span>
+                            <span className="text-[10px] font-bold text-primary tracking-tight uppercase">Vertex AI • Gemini 2.5</span>
                         </div>
                     </div>
                     <h2 className="text-xl font-bold tracking-tight text-on-surface mb-4 dark:text-white">Forensic Bias Analysis</h2>
