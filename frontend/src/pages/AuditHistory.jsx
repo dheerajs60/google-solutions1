@@ -11,7 +11,17 @@ export const AuditHistory = () => {
 
     useEffect(() => {
         if (user?.uid) {
-            auditService.getHistory(user.uid).then(setHistory);
+            auditService.getHistory(user.uid).then(data => {
+                if (Array.isArray(data)) {
+                    setHistory(data);
+                } else {
+                    console.error("History API returned non-array:", data);
+                    setHistory([]);
+                }
+            }).catch(err => {
+                console.error("History API failed:", err);
+                setHistory([]);
+            });
         } else {
             setHistory([]);
         }
