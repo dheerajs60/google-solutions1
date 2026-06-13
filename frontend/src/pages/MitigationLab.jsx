@@ -18,6 +18,8 @@ export const MitigationLab = () => {
 
     const paretoPoints = mitigationResult?.pareto_points || [];
     const afterMetrics = mitigationResult?.after_metrics;
+    const currentPoint = paretoPoints.find(p => p.type === 'Current');
+    const optimizedPoint = paretoPoints.find(p => p.type === 'After Mitigation');
 
     const handleSimulate = async () => {
         if (!auditId) return;
@@ -292,6 +294,34 @@ export const MitigationLab = () => {
                              </div>
                         </div>
                         <ParetoChart points={paretoPoints} isLoading={isSimulating} />
+                        
+                        {currentPoint && optimizedPoint && (
+                            <div className="mt-8 p-6 bg-surface-container-lowest border border-outline-variant/10 rounded-xl">
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-4">Overall Performance Impact</h4>
+                                <div className="grid grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-bold text-outline uppercase tracking-wider">Model Accuracy</p>
+                                        <div className="flex items-center space-x-3">
+                                            <span className="text-lg font-medium text-on-surface">{(currentPoint.accuracy * 100).toFixed(1)}%</span>
+                                            <span className="material-symbols-outlined text-outline-variant text-sm">trending_flat</span>
+                                            <span className={`text-xl font-black ${optimizedPoint.accuracy > currentPoint.accuracy ? "text-secondary" : optimizedPoint.accuracy < currentPoint.accuracy ? "text-error" : "text-primary"}`}>
+                                                {(optimizedPoint.accuracy * 100).toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-bold text-outline uppercase tracking-wider">Overall Fairness</p>
+                                        <div className="flex items-center space-x-3">
+                                            <span className="text-lg font-medium text-on-surface">{(currentPoint.fairness * 100).toFixed(1)}%</span>
+                                            <span className="material-symbols-outlined text-outline-variant text-sm">trending_flat</span>
+                                            <span className={`text-xl font-black ${optimizedPoint.fairness > currentPoint.fairness ? "text-secondary" : optimizedPoint.fairness < currentPoint.fairness ? "text-error" : "text-primary"}`}>
+                                                {(optimizedPoint.fairness * 100).toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
