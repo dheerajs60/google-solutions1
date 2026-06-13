@@ -19,9 +19,6 @@ def np_encoder(obj):
         return float(obj)
     if isinstance(obj, np.ndarray): return obj.tolist()
     return str(obj)
-        return float(obj)
-    if isinstance(obj, np.ndarray): return obj.tolist()
-    return str(obj)
 
 # Global in-memory dictionary to store audit states.
 ACTIVE_AUDITS: Dict[str, Dict[str, Any]] = {}
