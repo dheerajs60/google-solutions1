@@ -1,5 +1,6 @@
 from typing import Dict, Any, List
 import json
+import math
 import datetime
 import numpy as np
 from google.cloud import bigquery
@@ -9,9 +10,15 @@ from backend.config.firebase_admin import db
 from backend.config.bigquery_client import bq_client, project_id
 
 def np_encoder(obj):
+    import datetime
+    if isinstance(obj, datetime.datetime) or hasattr(obj, "isoformat"):
+        return obj.isoformat()
     if isinstance(obj, np.integer): return int(obj)
     if isinstance(obj, np.floating):
         if np.isnan(obj) or np.isinf(obj): return str(obj)
+        return float(obj)
+    if isinstance(obj, np.ndarray): return obj.tolist()
+    return str(obj)
         return float(obj)
     if isinstance(obj, np.ndarray): return obj.tolist()
     return str(obj)
@@ -157,11 +164,12 @@ def get_history(user_id: str = None) -> List[Dict[str, Any]]:
             
             if user_id:
                 # Get user's specific audits ONLY to ensure isolation
-                user_docs = query.where("user_id", "==", user_id).stream()
+                from google.cloud.firestore_v1.base_query import FieldFilter
+                user_docs = query.where(filter=FieldFilter("user_id", "==", user_id)).stream()
                 history = [doc.to_dict() for doc in user_docs]
                 
-                # Sort in-memory: newer dates first
-                history.sort(key=lambda x: x.get("date", ""), reverse=True)
+                # Sort in-memory: newer dates first, handling None gracefully
+                history.sort(key=lambda x: str(x.get("date") or ""), reverse=True)
                 history = history[:50]
             else:
                 # No user_id filter, we can use native ordering on a single field
@@ -185,7 +193,7 @@ def get_history(user_id: str = None) -> List[Dict[str, Any]]:
                 details = row.full_details
                 if isinstance(details, str):
                     details = json.loads(details)
-                res = details.get("results", {})
+                res = details.get("results") or {}
                 overall_score = res.get("overall_score", 0.0)
                 status = "PASS" if overall_score >= 0.8 else "WARNING" if overall_score >= 0.6 else "FAIL"
                 
@@ -208,7 +216,7 @@ def get_history(user_id: str = None) -> List[Dict[str, Any]]:
             if user_id and record_user_id != user_id:
                 continue
                 
-            overall_score = value.get("results", {}).get("overall_score", 0.0)
+            overall_score = (value.get("results") or {}).get("overall_score", 0.0)
             status = "PASS" if overall_score >= 0.8 else "WARNING" if overall_score >= 0.6 else "FAIL"
             history.append({
                 "id": key,
@@ -219,7 +227,20 @@ def get_history(user_id: str = None) -> List[Dict[str, Any]]:
                 "status": status
             })
             
-    return history
+
+    # Sanitize history to prevent serialization errors
+    sanitized_history = []
+    for item in history:
+        clean_item = json.loads(json.dumps(item, default=np_encoder))
+        
+        # Also clean up NaN which causes JS JSON.parse to fail if it somehow slips through
+        for k, v in clean_item.items():
+            if isinstance(v, float) and math.isnan(v):
+                clean_item[k] = 0.0
+                
+        sanitized_history.append(clean_item)
+    return sanitized_history
+
 
 def get_audit(audit_id: str) -> Dict[str, Any]:
     # Prioritize in-memory state to avoid race conditions with slow BigQuery updates

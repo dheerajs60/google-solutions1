@@ -80,7 +80,7 @@ export const AuditHistory = () => {
                                         </div>
                                         <div>
                                             <p className="text-xs font-black text-on-surface tracking-tight dark:text-white">{row.dataset}</p>
-                                            <p className="text-[10px] text-on-surface-variant uppercase font-medium dark:text-slate-500">Record ID: {row.id?.substring(0, 8).toUpperCase()}</p>
+                                            <p className="text-[10px] text-on-surface-variant uppercase font-medium dark:text-slate-500">Record ID: {row.id?.substring(0, 8)?.toUpperCase()}</p>
                                         </div>
                                     </div>
                                 </td>
