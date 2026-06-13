@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Union
 
 class AuditRequestConfig(BaseModel):
     target_column: str
@@ -22,7 +22,7 @@ class AuditResponse(BaseModel):
 
 class MitigationRequest(BaseModel):
     audit_id: str
-    reweighing_strength: float = 0.5
+    reweighing_strength: Union[float, Dict[str, float]] = 0.5
     threshold_adjust: float = 0.5
     apply_postprocessing: bool = False
 

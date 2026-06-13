@@ -1,3 +1,4 @@
+from typing import Union, Dict
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from fairlearn.postprocessing import ThresholdOptimizer
@@ -11,7 +12,7 @@ def _get_status(score):
 from fairlearn.preprocessing import CorrelationRemover
 from sklearn.ensemble import RandomForestClassifier
 
-def run_mitigation(audit_id: str, reweighing_strength: float, threshold_adjust: float, apply_post: bool) -> MitigationResponse:
+def run_mitigation(audit_id: str, reweighing_strength: Union[float, Dict[str, float]], threshold_adjust: float, apply_post: bool) -> MitigationResponse:
     stored = ACTIVE_AUDITS.get(audit_id)
     if not stored:
         raise ValueError("Audit ID not found or expired from memory. Please re-run the audit.")
@@ -45,42 +46,59 @@ def run_mitigation(audit_id: str, reweighing_strength: float, threshold_adjust: 
     
     # If AUTO-CORRECT is on, force maximum strengths
     if apply_post:
-        reweighing_strength = 1.0
+        if isinstance(reweighing_strength, dict):
+            reweighing_strength = {k: 1.0 for k in sensitive_attrs}
+        else:
+            reweighing_strength = 1.0
         threshold_adjust = 1.0
     
     # PHASE A: IN-PROCESSING (REWEIGHING)
     # If strength > 0, we re-train with sample weights to balance outcomes
-    if reweighing_strength > 0.1:
+    has_reweighing = False
+    if isinstance(reweighing_strength, dict):
+        has_reweighing = any(v > 0.1 for v in reweighing_strength.values())
+    else:
+        has_reweighing = reweighing_strength > 0.1
+
+    if has_reweighing:
         # Calculate sample weights for Demographic Parity
         y_total = len(y_train)
         y_pos = y_train.sum()
         y_neg = y_total - y_pos
         
         weights = pd.Series(1.0, index=y_train.index)
-        for group in sa_train.unique():
-            mask = (sa_train == group)
-            group_total = mask.sum()
-            if group_total == 0: continue
+        
+        for attr in sensitive_attrs:
+            sa_train_attr = sensitive_train[attr]
+            attr_strength = reweighing_strength.get(attr, 0.5) if isinstance(reweighing_strength, dict) else reweighing_strength
             
-            group_pos = (y_train[mask] == 1).sum()
-            group_neg = group_total - group_pos
+            if attr_strength <= 0.1:
+                continue
+                
+            attr_weights = pd.Series(1.0, index=y_train.index)
+            for group in sa_train_attr.unique():
+                mask = (sa_train_attr == group)
+                group_total = mask.sum()
+                if group_total == 0: continue
+                
+                group_pos = (y_train[mask] == 1).sum()
+                group_neg = group_total - group_pos
+                
+                # Theoretical weights to achieve parity
+                target_pos_rate = y_pos / y_total
+                current_pos_rate = group_pos / group_total
+                if group_pos > 0:
+                    pos_weight = target_pos_rate / current_pos_rate
+                    attr_weights[mask & (y_train == 1)] = 1.0 + (pos_weight - 1.0) * attr_strength
+                
+                target_neg_rate = y_neg / y_total
+                current_neg_rate = group_neg / group_total
+                if group_neg > 0:
+                    neg_weight = target_neg_rate / current_neg_rate
+                    attr_weights[mask & (y_train == 0)] = 1.0 + (neg_weight - 1.0) * attr_strength
             
-            # Theoretical weights to achieve parity
-            # If group has fewer positives than average, boost its positives
-            target_pos_rate = y_pos / y_total
-            current_pos_rate = group_pos / group_total
-            
-            if group_pos > 0:
-                pos_weight = target_pos_rate / current_pos_rate
-                weights[mask & (y_train == 1)] = 1.0 + (pos_weight - 1.0) * reweighing_strength
-            
-            # If group has more negatives than average, boost its negatives
-            target_neg_rate = y_neg / y_total
-            current_neg_rate = group_neg / group_total
-            
-            if group_neg > 0:
-                neg_weight = target_neg_rate / current_neg_rate
-                weights[mask & (y_train == 0)] = 1.0 + (neg_weight - 1.0) * reweighing_strength
+            # Multiply intersectional weights
+            weights *= attr_weights
         
         # Ensure weights are positive and not too crazy
         weights = weights.clip(lower=0.1, upper=10.0)

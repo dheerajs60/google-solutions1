@@ -40,6 +40,7 @@ export const useAuditStore = create(
             },
             
             // Mitigation Simulation State
+            reweighingMode: 'global', // 'global' or 'per-attribute'
             reweighingStrength: 0.5,
             thresholdAdjust: 0.5,
             applyPostProcessing: false,
